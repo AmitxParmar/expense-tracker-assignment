@@ -6,7 +6,7 @@ import connectDB from "./config/db";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-console.log('env var test', process.env.PORT)
+
 app.use(express.json());
 app.use(cors({ origin: "*", credentials: true }));
 app.use(cookieParser());
@@ -20,8 +20,6 @@ app.get("/", (req: express.Request, res: express.Response) => {
 /* route handlers */
 app.use("/api/auth", authRouter);
 app.use("/api/expenses", authRouter);
-
-
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
