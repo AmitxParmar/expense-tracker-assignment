@@ -3,12 +3,13 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Users, Receipt, BarChart3, FileText, DollarSign, Clock, CheckCircle, XCircle } from "lucide-react"
 import { ExpenseList } from "../ExpenseList"
-import { mockExpenses, mockUsers, type User } from "@/lib/mock-data"
+import { mockExpenses, mockUsers, } from "@/lib/mock-data"
 import { InsightsView } from "../InsightsView"
 import { AuditLogsView } from "../AuditLogsView"
+import type { IUser } from "@/types/types"
 
 interface AdminLayoutProps {
-    currentUser: User
+    currentUser: IUser
     activeTab: string
     setActiveTab: (tab: string) => void
 }

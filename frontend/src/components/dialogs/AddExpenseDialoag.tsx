@@ -1,7 +1,5 @@
 "use client"
-
 import type React from "react"
-
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
@@ -16,12 +14,12 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner"
-import type { User } from "../../lib/mock-data"
+import type { IUser } from "@/types/types"
 
 interface AddExpenseDialogProps {
     open: boolean
     onOpenChange: (open: boolean) => void
-    currentUser: User
+    currentUser: IUser
 }
 
 const categories = ["travel", "meals", "office-supplies", "software", "training", "marketing", "other"]

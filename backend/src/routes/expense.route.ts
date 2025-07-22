@@ -8,8 +8,12 @@ import {
     expensesOverTime,
     getAuditLogs
 } from '../controllers/expense.controller';
+import { protect } from '../middleware/auth';
 
 const router = Router();
+
+// protect from unauthorzed requests
+router.use(protect);
 
 // Employee routes
 router.post('/', addExpense);

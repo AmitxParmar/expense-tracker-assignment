@@ -7,10 +7,11 @@ import { Badge } from "@/components/ui/badge"
 import { Plus, Receipt, DollarSign, Clock, TrendingUp } from "lucide-react"
 import { AddExpenseDialog } from "../dialogs/AddExpenseDialoag"
 import { ExpenseList } from "../ExpenseList"
-import { mockExpenses, type User } from "../../lib/mock-data"
+import { mockExpenses, } from "../../lib/mock-data"
+import type { IUser } from "@/types/types"
 
 interface EmployeeLayoutProps {
-    currentUser: User
+    currentUser: IUser 
     activeTab: string
     setActiveTab: (tab: string) => void
 }
@@ -18,7 +19,7 @@ interface EmployeeLayoutProps {
 export function EmployeeLayout({ currentUser, activeTab, setActiveTab }: EmployeeLayoutProps) {
     const [showAddExpense, setShowAddExpense] = useState(false)
 
-    const myExpenses = mockExpenses.filter((expense) => expense.employeeId === currentUser.id)
+    const myExpenses = mockExpenses.filter((expense) => expense.employeeId === currentUser._id)
     const totalAmount = myExpenses.reduce((sum, expense) => sum + expense.amount, 0)
     const pendingExpenses = myExpenses.filter((expense) => expense.status === "pending")
     const approvedExpenses = myExpenses.filter((expense) => expense.status === "approved")
@@ -43,7 +44,6 @@ export function EmployeeLayout({ currentUser, activeTab, setActiveTab }: Employe
                         </div>
                     </CardContent>
                 </Card>
-
                 <Card>
                     <CardContent className="p-6">
                         <div className="flex items-center justify-between">

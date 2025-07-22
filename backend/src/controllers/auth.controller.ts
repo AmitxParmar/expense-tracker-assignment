@@ -1,11 +1,11 @@
+import type { CustomJwtPayload } from './../types/types';
 import type { Request, Response, NextFunction } from "express";
 import { createError } from "../utils/error";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
-import jwt, { type JwtPayload } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import User from "../models/User";
 import { generateRefreshToken, generateToken } from "../utils/generateTokens";
-import type { CustomJwtPayload, IUser } from "../../types/types";
 
 
 const setTokenCookie = (res: Response, token: string, refreshToken: string) => {
@@ -25,6 +25,34 @@ const setTokenCookie = (res: Response, token: string, refreshToken: string) => {
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 };
+
+
+// Fetch Current Protected
+export const fetchMe = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        // The user ID is attached to the request by the authentication middleware
+        const userId = req.user.id;
+
+        // Fetch the user from the database, excluding the password
+        const user = await User.findById(userId)
+            .select("-password")
+
+        if (!user) {
+            return next(createError(404, "User not found"));
+        }
+
+        // Send the user data
+        res.status(200).json({
+            success: true,
+            message: "Current user data fetched successfully!",
+            data: user,
+        });
+    } catch (error) {
+        console.error("Error fetching current user:", error);
+        next(createError(500, "Error fetching user data"));
+    }
+};
+
 
 export const register = [
     async (req: Request, res: Response, next: NextFunction) => {
@@ -56,7 +84,7 @@ export const register = [
                         success: true,
                         message:
                             "User successfully registered. Please check your email to verify your account.",
-                        user: userDetails,
+                        data: userDetails,
                     });
                 })
                 .catch((error) => {
@@ -94,7 +122,7 @@ export const login = [
             }
 
             const user = await User.findOne({ email }).select("+password");
-            if (!user || !(await bcrypt.compare(password, user.password))) {
+            if (!user || !bcrypt.compare(password, user.password!)) {
                 return next(createError(401, "Invalid credentials"));
             }
 
@@ -115,15 +143,17 @@ export const login = [
             const refreshToken = generateRefreshToken(user);
             setTokenCookie(res, token, refreshToken);
             console.log("login success!");
-            res.status(200).json({
-                success: true,
-                message: "Login successful",
-                user: {
-                    id: user._id,
-                    email: user.email,
-                    role: user.role,
-                },
-            });
+            res
+                .status(200)
+                .json({
+                    success: true,
+                    message: "Login successful",
+                    data: {
+                        id: user._id,
+                        email: user.email,
+                        role: user.role,
+                    },
+                });
         } catch (error) {
             console.error("Login error:", error);
             next(createError(500, "An unexpected error occurred during login"));
