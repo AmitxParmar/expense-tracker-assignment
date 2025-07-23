@@ -9,11 +9,13 @@ import Register from "./pages/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { useAuth } from "./hooks/useAuth";
 
+
 function App() {
   const { isAuthenticated } = useAuth()
   return (
     <Routes>
       <Route element={<AuthLayout />}>
+        
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
       </Route>

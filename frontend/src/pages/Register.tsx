@@ -13,37 +13,20 @@ import { Input } from "@/components/ui/input";
 import { LucideUserPlus2 } from "lucide-react";
 
 import { useForm } from "react-hook-form";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import type { Credentials, } from "@/types/types";
 import { AxiosError } from "axios";
+import type { Credentials, } from "@/types/types";
 
 
 const Register = () => {
     const form = useForm({
         resolver: zodResolver(
             z.object({
-                email: z
-                    .string()
-
-                    .refine(
-                        (val) => {
-                            const [_, provider] = val.split("@");
-                            return (
-                                provider === "gmail.com" ||
-                                provider === "yahoo.com" ||
-                                provider === "outlook.com" ||
-                                provider.endsWith(".edu")
-                            );
-                        },
-                        {
-                            message:
-                                "Please use a valid email provider (e.g., gmail, yahoo, outlook, .edu) for email verification.",
-                        }
-                    ),
+                email: z.string(),
                 password: z
                     .string()
                     .min(8, "Password must be at least 8 characters long")
@@ -51,13 +34,11 @@ const Register = () => {
                         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
                         "Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character"
                     ),
-                inviteCode: z.string().optional(),
             })
         ),
     });
     const { register, isLoading } = useAuth();
     const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
     const { mutate: registerUser, } = register;
 
     const handleSubmit = (credentials: Credentials) => {
@@ -72,7 +53,7 @@ const Register = () => {
                     });
                 console.log(error);
             },
-        }); // on save button press send data to the apis
+        });
     };
 
     return (
@@ -130,41 +111,12 @@ const Register = () => {
                                         </FormItem>
                                     )}
                                 />
-                                <FormField
-                                    control={form.control}
-                                    name="inviteCode"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="sr-only">
-                                                Enter invite code eg.#9ubn789
-                                            </FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    id="inviteCode"
-                                                    placeholder="Enter invite code eg.#9ubn789"
-                                                    type="text"
-                                                    autoCapitalize="none"
-                                                    autoComplete="off"
-                                                    autoCorrect="off"
-                                                    disabled={
-                                                        isLoading || !!searchParams.get("inviteCode")
-                                                    }
-                                                    {...field}
-                                                    value={
-                                                        field.value || searchParams.get("inviteCode") || ""
-                                                    }
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
 
                                 <Button disabled={isLoading}>
                                     {isLoading && (
                                         <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
                                     )}
-                                    Sign In with Email
+                                    Sign Up with Email
                                 </Button>
                             </div>
                         </form>

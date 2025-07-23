@@ -1,16 +1,15 @@
 import { Outlet } from "react-router-dom";
+import Navbar from "../Navbar";
 
 const AuthLayout = () => (
     <>
+        <Navbar />
         <div className="container min-h-full h-[calc(100vh-8vh)] flex flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
             <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex overflow-hidden">
                 <div className="absolute inset-0 bg-zinc-900" />
-                <img
-                    className="bg-center min-h-full bg-cover inset-0 absolute"
-                    src="pngegg.png"
-                />
 
-                <div className="absolute bottom-6 left-1/4 z-20 flex items-center text-lg font-medium">
+
+                <div className="absolute bottom-6 left-30 z-20 flex items-center text-lg font-medium">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 24 24"

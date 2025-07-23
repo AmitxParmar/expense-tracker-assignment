@@ -34,11 +34,11 @@ const Login = () => {
             onError: (error) => {
                 toast.error("Error Loggin In!", { description: error.message });
             },
-        }); 
+        });
     };
 
     return (
-        <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
+        <div className="mx-auto flex w-full flex-col px-6 justify-center space-y-6 sm:w-[350px]">
             <div className="flex flex-col space-y-2 text-center">
                 <h1 className="text-2xl flex items-center justify-center gap-4 font-grotesk font-semibold tracking-tight">
                     <span>Login to account </span>
