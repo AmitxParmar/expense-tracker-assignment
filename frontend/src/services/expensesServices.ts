@@ -29,7 +29,7 @@ export const changeExpenseStatus = async (id: string | undefined, status: string
 };
 
 // Get expenses per category (Insights)
-export const getExpensesPerCategory = async () => {
+export const getExpensesPerCategory = async (): Promise<ICustomResponse<IExpense[]>> => {
     const { data } = await axiosInstance.get(`${BASE_URL}/insights/category`);
     return data;
 };

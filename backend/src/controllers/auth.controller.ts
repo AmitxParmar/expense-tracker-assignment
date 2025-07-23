@@ -7,28 +7,21 @@ import jwt from "jsonwebtoken";
 import User from "../models/User";
 import { generateRefreshToken, generateToken } from "../utils/generateTokens";
 
-/**
- * Sets the token and refreshToken cookies with SameSite=None and Secure=true in production,
- * to allow cross-site cookies for authentication in modern browsers.
- */
+
 const setTokenCookie = (res: Response, token: string, refreshToken: string) => {
     const isProduction = process.env.NODE_ENV === "production";
 
-    // Always use SameSite=None and Secure=true for cross-site cookies in production
-    // In development, allow lax for local testing, but you may need to use None+Secure if using HTTPS locally
-    const cookieOptions = {
-        httpOnly: true,
-        secure: isProduction, // Secure must be true for SameSite=None
-        sameSite: "none" as const, // Always use 'none' for cross-site
-    };
-
     res.cookie("token", token, {
-        ...cookieOptions,
+        httpOnly: true,
+        secure: isProduction, // Only secure in production
+        sameSite: isProduction ? "none" : "lax", // 'none' in production, 'lax' in development
         maxAge: 20 * 60 * 1000, // 20 minutes
     });
 
     res.cookie("refreshToken", refreshToken, {
-        ...cookieOptions,
+        httpOnly: true,
+        secure: isProduction, // Only secure in production
+        sameSite: isProduction ? "none" : "lax", // 'none' in production, 'lax' in development
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 };
@@ -129,8 +122,7 @@ export const login = [
             }
 
             const user = await User.findOne({ email }).select("+password");
-            // bcrypt.compare is async, so must await it
-            if (!user || !(await bcrypt.compare(password, user.password!))) {
+            if (!user || !bcrypt.compare(password, user.password!)) {
                 return next(createError(401, "Invalid credentials"));
             }
 

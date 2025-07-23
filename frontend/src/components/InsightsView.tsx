@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Bar, BarChart, Line, LineChart, Pie, PieChart, Cell, XAxis, YAxis } from "recharts"
 import { mockExpenses } from "../lib/mock-data"
+import { useExpensesPerCategory } from "@/hooks/useExpensesPerCategory"
 
 const chartConfig = {
     amount: {
@@ -15,6 +16,8 @@ const chartConfig = {
 }
 
 export function InsightsView() {
+    const { data } = useExpensesPerCategory()
+    console.log(data)
     // Expenses by category
     const categoryData = Object.entries(
         mockExpenses.reduce(
