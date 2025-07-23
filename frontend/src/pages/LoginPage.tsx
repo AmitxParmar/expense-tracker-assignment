@@ -27,7 +27,7 @@ const Login = () => {
 
     const handleSubmit: SubmitHandler<Credentials> = (credentials) => {
         loginUser(credentials, {
-            onSuccess: (data) => {
+            onSuccess: () => {
                 toast.success("Login Success!");
                 navigate(`/`);
             },

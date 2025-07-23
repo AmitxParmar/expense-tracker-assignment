@@ -43,7 +43,7 @@ const Register = () => {
 
     const handleSubmit = (credentials: Credentials) => {
         registerUser(credentials, {
-            onSuccess: (data) => {
+            onSuccess: () => {
                 navigate(`/`);
             },
             onError: (error) => {
