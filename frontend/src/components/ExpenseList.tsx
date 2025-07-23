@@ -53,7 +53,7 @@ export function ExpenseList({ expenses, user, showEmployee = false, isAdmin = fa
         }
     }
 
-    console.log("expenses length", expenses?.length, expenses)
+    
     if (expenses?.length === 0) {
         return (
             <div className="text-center py-8 text-muted-foreground">

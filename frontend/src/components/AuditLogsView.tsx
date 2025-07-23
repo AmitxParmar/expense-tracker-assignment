@@ -46,7 +46,7 @@ export function AuditLogsView() {
                 return <Badge variant="outline">{action}</Badge>
         }
     }
-    console.log(error)
+    
     if (isLoading) return <div className="px-4 py-2">Loading</div>;
     if (error) return <div className="px-4 py-2 text-red-500">{(error as Error).message}</div>
 

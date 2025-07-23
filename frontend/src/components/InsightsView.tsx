@@ -22,8 +22,8 @@ type InsightsViewProps = {
 };
 
 export function InsightsView({ role, expenses }: InsightsViewProps) {
-    const { data: category } = useExpensesPerCategory();
-    const { data: timeData } = useExpensesOverTime(role);
+    const { data: category, isLoading: isCategoryLoading } = useExpensesPerCategory();
+    const { data: timeData, isLoading: isTimeDataLoading } = useExpensesOverTime(role);
 
     const memoizedStatuses = useMemo(() => {
         return Object.entries(
@@ -60,7 +60,7 @@ export function InsightsView({ role, expenses }: InsightsViewProps) {
                         <CardTitle>Expenses by Category</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <ChartContainer config={chartConfig} className="h-[300px]">
+                        {!isCategoryLoading?<ChartContainer config={chartConfig} className="h-[300px]">
                             <BarChart data={category?.data}>
                                 <XAxis dataKey="_id" tick={{ fontSize: 12 }} angle={-45} textAnchor="end" height={80} />
                                 <YAxis />
@@ -68,7 +68,7 @@ export function InsightsView({ role, expenses }: InsightsViewProps) {
                                 <Bar dataKey="total" fill="var(--color-amount)" radius={[4, 4, 0, 0]} />
 
                             </BarChart>
-                        </ChartContainer>
+                        </ChartContainer>:<>Category Chart is loading.....</>}
                     </CardContent>
                 </Card>
 
@@ -78,7 +78,7 @@ export function InsightsView({ role, expenses }: InsightsViewProps) {
                         <CardTitle>Expense Status Distribution</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <ChartContainer config={chartConfig} className="h-[300px]">
+                        {<ChartContainer config={chartConfig} className="h-[300px]">
                             <PieChart>
                                 <Pie
                                     data={memoizedStatuses}
@@ -94,7 +94,7 @@ export function InsightsView({ role, expenses }: InsightsViewProps) {
                                 </Pie>
                                 <ChartTooltip content={<ChartTooltipContent />} />
                             </PieChart>
-                        </ChartContainer>
+                        </ChartContainer>}
                     </CardContent>
                 </Card>
             </div>
@@ -105,7 +105,8 @@ export function InsightsView({ role, expenses }: InsightsViewProps) {
                     <CardTitle>Expenses Over Time</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <ChartContainer config={chartConfig} className="h-[400px]">
+
+                    {!isTimeDataLoading ? <ChartContainer config={chartConfig} className="h-[400px]">
                         <LineChart data={timeData.data}>
                             <XAxis dataKey="_id.month" />
                             <YAxis />
@@ -118,7 +119,7 @@ export function InsightsView({ role, expenses }: InsightsViewProps) {
                                 dot={{ fill: "var(--color-amount)" }}
                             />
                         </LineChart>
-                    </ChartContainer>
+                    </ChartContainer> : <>Loading</>}
                 </CardContent>
             </Card>
 

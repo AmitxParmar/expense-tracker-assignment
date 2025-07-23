@@ -16,11 +16,7 @@ interface AdminLayoutProps {
 }
 
 export function AdminLayout({ currentUser, activeTab, setActiveTab }: AdminLayoutProps) {
-    const { data, error } = useAllExpenses(currentUser.role);
-    console.log(data, error, currentUser)
-
-    // useMemo is the correct choice here because we are memoizing computed values (arrays and numbers)
-    // based on the data, not memoizing functions. useCallback is for memoizing functions.
+    const { data } = useAllExpenses(currentUser.role);
 
 
     const expenses: IExpense[] = data?.data ?? [];
