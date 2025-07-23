@@ -142,7 +142,7 @@ export function AdminLayout({ currentUser, activeTab, setActiveTab }: AdminLayou
                 </Card>
             )}
 
-            {activeTab === "insights" && <InsightsView />}
+            {activeTab === "insights" && <InsightsView expenses={data.data} role={currentUser.role} />}
 
             {activeTab === "audit-logs" && <AuditLogsView />}
         </div>

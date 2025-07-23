@@ -3,6 +3,9 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 import { Bar, BarChart, Line, LineChart, Pie, PieChart, Cell, XAxis, YAxis } from "recharts"
 import { mockExpenses } from "../lib/mock-data"
 import { useExpensesPerCategory } from "@/hooks/useExpensesPerCategory"
+import { useExpensesOverTime } from "@/hooks/useExpensesOverTime"
+import type { IExpense } from "@/types/types"
+import { useMemo } from "react"
 
 const chartConfig = {
     amount: {
@@ -14,26 +17,37 @@ const chartConfig = {
         color: "hsl(var(--chart-2))",
     },
 }
+type InsightsViewProps = {
+    role: "admin" | "employee";
+    expenses: IExpense[]
+};
 
-export function InsightsView() {
-    const { data: category } = useExpensesPerCategory()
-    console.log("Category", category)
-    // Expenses by category
+export function InsightsView({ role, expenses }: InsightsViewProps) {
+    const { data: category } = useExpensesPerCategory();
+    const { data: timeData } = useExpensesOverTime(role);
 
-    // Expenses over time (last 6 months)
-    const timeData = Array.from({ length: 6 }, (_, i) => {
-        const date = new Date()
-        date.setMonth(date.getMonth() - i)
-        const monthKey = date.toISOString().slice(0, 7)
-
-        const monthExpenses = mockExpenses.filter((expense) => expense.date.startsWith(monthKey))
-
-        return {
-            month: date.toLocaleDateString("en-US", { month: "short", year: "numeric" }),
-            amount: monthExpenses.reduce((sum, expense) => sum + expense.amount, 0),
-            count: monthExpenses.length,
-        }
-    }).reverse()
+    const memoizedStatuses = useMemo(() => {
+        return Object.entries(
+            expenses.reduce(
+                (acc, expense) => {
+                    const status = expense.status ?? "unknown";
+                    acc[status] = (acc[status] || 0) + 1;
+                    return acc;
+                },
+                {} as Record<string, number>
+            )
+        ).map(([status, count]) => ({
+            status: status.charAt(0).toUpperCase() + status.slice(1),
+            count,
+            fill: status === "approved"
+                ? "#22c55e"
+                : status === "pending"
+                    ? "#f59e0b"
+                    : status === "rejected"
+                        ? "#ef4444"
+                        : "#a3a3a3", // fallback color for unknown/undefined
+        }));
+    }, [expenses]);
 
     // Status distribution
     const statusData = Object.entries(
@@ -80,14 +94,14 @@ export function InsightsView() {
                         <ChartContainer config={chartConfig} className="h-[300px]">
                             <PieChart>
                                 <Pie
-                                    data={statusData}
+                                    data={memoizedStatuses}
                                     cx="50%"
                                     cy="50%"
                                     outerRadius={80}
                                     dataKey="count"
                                     label={({ status, count }) => `${status}: ${count}`}
                                 >
-                                    {statusData.map((entry, index) => (
+                                    {memoizedStatuses.map((entry, index) => (
                                         <Cell key={`cell-${index}`} fill={entry.fill} />
                                     ))}
                                 </Pie>
@@ -105,13 +119,13 @@ export function InsightsView() {
                 </CardHeader>
                 <CardContent>
                     <ChartContainer config={chartConfig} className="h-[400px]">
-                        <LineChart data={timeData}>
-                            <XAxis dataKey="month" />
+                        <LineChart data={timeData.data}>
+                            <XAxis dataKey="_id.month" />
                             <YAxis />
                             <ChartTooltip content={<ChartTooltipContent />} />
                             <Line
                                 type="monotone"
-                                dataKey="amount"
+                                dataKey="total"
                                 stroke="var(--color-amount)"
                                 strokeWidth={2}
                                 dot={{ fill: "var(--color-amount)" }}
@@ -122,7 +136,7 @@ export function InsightsView() {
             </Card>
 
             {/* Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/*<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Card>
                     <CardContent className="p-6">
                         <div className="text-center">
@@ -163,7 +177,7 @@ export function InsightsView() {
                         </div>
                     </CardContent>
                 </Card>
-            </div>
+            </div>*/}
         </div>
     )
 }

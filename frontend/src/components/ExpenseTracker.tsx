@@ -48,7 +48,6 @@ export function ExpenseTracker() {
                             </Badge>
 
                             <DropdownMenu>
-
                                 <Avatar className="h-8 w-8">
                                     <AvatarFallback>
                                         {currentUser?.name ?? ""}
