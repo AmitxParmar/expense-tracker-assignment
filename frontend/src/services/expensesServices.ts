@@ -1,16 +1,17 @@
 import axiosInstance from "@/lib/axios";
+import type { IAuditLog, ICustomResponse, IExpense } from "@/types/types";
 
 // Base API URL
 const BASE_URL = "/expenses";
 
 // Add a new expense (Employee)
-export const addExpense = async (expenseData: any) => {
+export const addExpense = async (expenseData: IExpense): Promise<ICustomResponse<Partial<IExpense>>> => {
     const { data } = await axiosInstance.post(`${BASE_URL}/`, expenseData);
     return data;
 };
 
 // Get my expenses (Employee)
-export const getMyExpenses = async () => {
+export const getMyExpenses = async (): Promise<ICustomResponse<IExpense[]>> => {
     const { data } = await axiosInstance.get(`${BASE_URL}/my`);
     return data;
 };
@@ -22,7 +23,7 @@ export const getAllExpenses = async () => {
 };
 
 // Change expense status (Admin)
-export const changeExpenseStatus = async (id: string, status: string) => {
+export const changeExpenseStatus = async (id: string | undefined, status: string) => {
     const { data } = await axiosInstance.patch(`${BASE_URL}/${id}/status`, { status });
     return data;
 };
@@ -40,7 +41,7 @@ export const getExpensesOverTime = async () => {
 };
 
 // Get audit logs (Admin)
-export const getAuditLogs = async () => {
+export const getAuditLogs = async (): Promise<ICustomResponse<IAuditLog[]>> => {
     const { data } = await axiosInstance.get(`${BASE_URL}/audit/logs`);
     return data;
 };

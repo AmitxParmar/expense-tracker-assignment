@@ -18,7 +18,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import type { Credentials,  } from "@/types/types";
+import type { Credentials, } from "@/types/types";
+import { AxiosError } from "axios";
 
 
 const Register = () => {
@@ -27,7 +28,7 @@ const Register = () => {
             z.object({
                 email: z
                     .string()
-                    .email("Please enter a valid email")
+
                     .refine(
                         (val) => {
                             const [_, provider] = val.split("@");
@@ -54,7 +55,7 @@ const Register = () => {
             })
         ),
     });
-    const { register } = useAuth();
+    const { register, isLoading } = useAuth();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const { mutate: registerUser, } = register;
@@ -64,10 +65,11 @@ const Register = () => {
             onSuccess: (data) => {
                 navigate(`/dashboard/${data?.data.role}`);
             },
-            onError: (error: ICustomAxiosError) => {
-                toast.error("Error!", {
-                    description: error?.response?.data?.message,
-                });
+            onError: (error) => {
+                if (error instanceof AxiosError)
+                    toast.error("Error!", {
+                        description: error?.response?.data?.message,
+                    });
                 console.log(error);
             },
         }); // on save button press send data to the apis

@@ -2,61 +2,20 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Clock, FileText, CheckCircle, XCircle } from "lucide-react"
-import { mockUsers } from "../lib/mock-data"
-
-// Mock audit log data
-const auditLogs = [
-    {
-        id: "1",
-        action: "expense_approved",
-        description: "Approved expense for office supplies",
-        userId: "admin-1",
-        targetId: "exp-1",
-        timestamp: "2024-01-15T10:30:00Z",
-        metadata: { amount: 150.0, category: "office-supplies" },
-    },
-    {
-        id: "2",
-        action: "expense_rejected",
-        description: "Rejected expense for team lunch",
-        userId: "admin-1",
-        targetId: "exp-2",
-        timestamp: "2024-01-15T09:15:00Z",
-        metadata: { amount: 85.5, category: "meals", reason: "Exceeds policy limit" },
-    },
-    {
-        id: "3",
-        action: "expense_submitted",
-        description: "New expense submitted for software license",
-        userId: "emp-1",
-        targetId: "exp-3",
-        timestamp: "2024-01-15T08:45:00Z",
-        metadata: { amount: 299.99, category: "software" },
-    },
-    {
-        id: "4",
-        action: "expense_approved",
-        description: "Approved expense for conference travel",
-        userId: "admin-1",
-        targetId: "exp-4",
-        timestamp: "2024-01-14T16:20:00Z",
-        metadata: { amount: 1250.0, category: "travel" },
-    },
-    {
-        id: "5",
-        action: "expense_submitted",
-        description: "New expense submitted for marketing materials",
-        userId: "emp-2",
-        targetId: "exp-5",
-        timestamp: "2024-01-14T14:30:00Z",
-        metadata: { amount: 75.25, category: "marketing" },
-    },
-]
+import { useAuth } from "@/hooks/useAuth"
+import { getAuditLogs } from "@/services/expensesServices"
+import { useQuery } from "@tanstack/react-query"
+import type { IAuditLog } from "@/types/types"
 
 export function AuditLogsView() {
-    const getUser = (userId: string) => {
-        return mockUsers.find((user) => user.id === userId)
-    }
+    const { user } = useAuth()
+    const { data, isLoading, error } = useQuery({
+        queryKey: ["expenses", "audit", "logs"],
+        queryFn: getAuditLogs,
+        enabled: user?.role === "admin" && user.role !== undefined,
+    });
+
+    const auditLogs: IAuditLog[] = data?.data || [];
 
     const getActionIcon = (action: string) => {
         switch (action) {
@@ -87,6 +46,9 @@ export function AuditLogsView() {
                 return <Badge variant="outline">{action}</Badge>
         }
     }
+    console.log(error)
+    if (isLoading) return <div className="px-4 py-2">Loading</div>;
+    if (error) return <div className="px-4 py-2 text-red-500">{(error as Error).message}</div>
 
     return (
         <div className="space-y-6">
@@ -99,10 +61,11 @@ export function AuditLogsView() {
                 </CardHeader>
                 <CardContent>
                     <div className="space-y-4">
-                        {auditLogs.map((log) => {
-                            const user = getUser(log.userId)
+                        {auditLogs.length === 0 && <div className="text-center text-muted-foreground">No audit logs found.</div>}
+                        {auditLogs.map((log, idx) => {
+                            const logUser = log.user;
                             return (
-                                <div key={log.id} className="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg">
+                                <div key={idx} className="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg">
                                     <div className="flex-shrink-0">{getActionIcon(log.action)}</div>
 
                                     <div className="flex-1 min-w-0">
@@ -110,39 +73,18 @@ export function AuditLogsView() {
                                             <div className="flex items-center space-x-2">
                                                 <Avatar className="h-6 w-6">
                                                     <AvatarFallback className="text-xs">
-                                                        {user?.name
-                                                            .split(" ")
-                                                            .map((n) => n[0])
-                                                            .join("") || "U"}
+                                                        {logUser?.name
+                                                            ? logUser.name.split(" ").map((n: string) => n[0]).join("")
+                                                            : "U"}
                                                     </AvatarFallback>
                                                 </Avatar>
-                                                <span className="text-sm font-medium">{user?.name || "Unknown User"}</span>
+                                                <span className="text-sm font-medium">{logUser?.name || "Unknown User"}</span>
                                                 {getActionBadge(log.action)}
                                             </div>
                                             <span className="text-xs text-muted-foreground">{new Date(log.timestamp).toLocaleString()}</span>
                                         </div>
 
-                                        <p className="text-sm text-gray-700 mb-2">{log.description}</p>
-
-                                        {log.metadata && (
-                                            <div className="flex flex-wrap gap-2 text-xs">
-                                                {log.metadata.amount && (
-                                                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                                                        Amount: ${log.metadata.amount.toFixed(2)}
-                                                    </span>
-                                                )}
-                                                {log.metadata.category && (
-                                                    <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded capitalize">
-                                                        {log.metadata.category.replace("-", " ")}
-                                                    </span>
-                                                )}
-                                                {log.metadata.reason && (
-                                                    <span className="bg-red-100 text-red-800 px-2 py-1 rounded">
-                                                        Reason: {log.metadata.reason}
-                                                    </span>
-                                                )}
-                                            </div>
-                                        )}
+                                        <p className="text-sm text-gray-700 mb-2">{log.details}</p>
                                     </div>
                                 </div>
                             )
@@ -159,7 +101,7 @@ export function AuditLogsView() {
                             <p className="text-2xl font-bold text-green-600">
                                 {auditLogs.filter((log) => log.action === "expense_approved").length}
                             </p>
-                            <p className="text-sm text-muted-foreground">Approvals Today</p>
+                            <p className="text-sm text-muted-foreground">Approvals</p>
                         </div>
                     </CardContent>
                 </Card>
@@ -170,7 +112,7 @@ export function AuditLogsView() {
                             <p className="text-2xl font-bold text-red-600">
                                 {auditLogs.filter((log) => log.action === "expense_rejected").length}
                             </p>
-                            <p className="text-sm text-muted-foreground">Rejections Today</p>
+                            <p className="text-sm text-muted-foreground">Rejections</p>
                         </div>
                     </CardContent>
                 </Card>
@@ -181,7 +123,7 @@ export function AuditLogsView() {
                             <p className="text-2xl font-bold text-blue-600">
                                 {auditLogs.filter((log) => log.action === "expense_submitted").length}
                             </p>
-                            <p className="text-sm text-muted-foreground">Submissions Today</p>
+                            <p className="text-sm text-muted-foreground">Submissions</p>
                         </div>
                     </CardContent>
                 </Card>

@@ -1,5 +1,3 @@
-"use client"
-
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -7,22 +5,24 @@ import { Badge } from "@/components/ui/badge"
 import { Plus, Receipt, DollarSign, Clock, TrendingUp } from "lucide-react"
 import { AddExpenseDialog } from "../dialogs/AddExpenseDialoag"
 import { ExpenseList } from "../ExpenseList"
-import { mockExpenses, } from "../../lib/mock-data"
 import type { IUser } from "@/types/types"
+import { useMyExpenses } from "@/hooks/useMyExpenses"
 
 interface EmployeeLayoutProps {
-    currentUser: IUser 
+    currentUser: IUser
     activeTab: string
     setActiveTab: (tab: string) => void
 }
 
 export function EmployeeLayout({ currentUser, activeTab, setActiveTab }: EmployeeLayoutProps) {
     const [showAddExpense, setShowAddExpense] = useState(false)
+    const { data } = useMyExpenses();
+    console.log(data)
 
-    const myExpenses = mockExpenses.filter((expense) => expense.employeeId === currentUser._id)
-    const totalAmount = myExpenses.reduce((sum, expense) => sum + expense.amount, 0)
-    const pendingExpenses = myExpenses.filter((expense) => expense.status === "pending")
-    const approvedExpenses = myExpenses.filter((expense) => expense.status === "approved")
+    //const myExpenses = mockExpenses.filter((expense) => expense.employeeId === currentUser._id)
+    const totalAmount = data?.data?.reduce((sum, expense) => sum + (expense.amount || 0), 0);
+    const pendingExpenses = data?.data?.filter((expense) => expense?.status === "pending");
+    const approvedExpenses = data?.data?.filter((expense) => expense?.status === "approved");
 
     const tabs = [
         { id: "expenses", label: "My Expenses", icon: Receipt },
@@ -38,7 +38,7 @@ export function EmployeeLayout({ currentUser, activeTab, setActiveTab }: Employe
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-medium text-muted-foreground">Total Expenses</p>
-                                <p className="text-2xl font-bold">${totalAmount.toFixed(2)}</p>
+                                <p className="text-2xl font-bold">${totalAmount?.toFixed(2)}</p>
                             </div>
                             <DollarSign className="h-8 w-8 text-blue-600" />
                         </div>
@@ -49,7 +49,7 @@ export function EmployeeLayout({ currentUser, activeTab, setActiveTab }: Employe
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-medium text-muted-foreground">Pending</p>
-                                <p className="text-2xl font-bold">{pendingExpenses.length}</p>
+                                <p className="text-2xl font-bold">{pendingExpenses?.length}</p>
                             </div>
                             <Clock className="h-8 w-8 text-yellow-600" />
                         </div>
@@ -61,7 +61,7 @@ export function EmployeeLayout({ currentUser, activeTab, setActiveTab }: Employe
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-medium text-muted-foreground">Approved</p>
-                                <p className="text-2xl font-bold">{approvedExpenses.length}</p>
+                                <p className="text-2xl font-bold">{approvedExpenses?.length}</p>
                             </div>
                             <Receipt className="h-8 w-8 text-green-600" />
                         </div>
@@ -110,7 +110,7 @@ export function EmployeeLayout({ currentUser, activeTab, setActiveTab }: Employe
                         </Button>
                     </CardHeader>
                     <CardContent>
-                        <ExpenseList expenses={myExpenses} showEmployee={false} />
+                        {data?.success && <ExpenseList expenses={data?.data} showEmployee={false} />}
                     </CardContent>
                 </Card>
             )}
@@ -123,10 +123,10 @@ export function EmployeeLayout({ currentUser, activeTab, setActiveTab }: Employe
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-4">
-                                {myExpenses.slice(0, 5).map((expense) => (
-                                    <div key={expense.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                {data?.data.slice(0, 5).map((expense) => (
+                                    <div key={expense._id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                                         <div>
-                                            <p className="font-medium">{expense.description}</p>
+                                            <p className="font-medium">{expense?.notes}</p>
                                             <p className="text-sm text-muted-foreground">{expense.category}</p>
                                         </div>
                                         <div className="text-right">
@@ -155,8 +155,8 @@ export function EmployeeLayout({ currentUser, activeTab, setActiveTab }: Employe
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-3">
-                                {Object.entries(
-                                    myExpenses.reduce(
+                                {data?.data && Object.entries(
+                                    data?.data.reduce(
                                         (acc, expense) => {
                                             acc[expense.category] = (acc[expense.category] || 0) + expense.amount
                                             return acc

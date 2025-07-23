@@ -1,4 +1,5 @@
 
+
 export interface IUser {
     _id: string;
     name: string;
@@ -7,16 +8,18 @@ export interface IUser {
     createdAt: string;
 }
 
-export interface IExpenses {
+export interface IExpense {
+    _id?: string;
     amount: number;
     category: string;
     date: Date;
     notes: string;
-    status: "pending" | "approved" | "rejected";
-    user: IUser;
+    status?: "pending" | "approved" | "rejected";
+    user?: IUser;
 }
 
 export interface IAuditLog {
+    _id: string;
     action: string;
     details: string;
     user: IUser;
@@ -34,3 +37,4 @@ export interface ICustomResponse<T> {
     message: string;
     data: T;
 }
+

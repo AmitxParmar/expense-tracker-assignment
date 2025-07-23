@@ -8,28 +8,42 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { MoreHorizontal, Check, X, Eye } from "lucide-react"
 import { toast } from "sonner"
-import { mockUsers, type Expense } from "../lib/mock-data"
 import { Receipt } from "lucide-react" // Declared Receipt here
+import type { IExpense, IUser } from "@/types/types"
+
+import { useChangeExpenseStatus } from "@/hooks/useChangeExpenseStatus"
+
 
 interface ExpenseListProps {
-    expenses: Expense[]
+    expenses: IExpense[]
     showEmployee?: boolean
     isAdmin?: boolean
+    user: IUser
 }
 
-export function ExpenseList({ expenses, showEmployee = false, isAdmin = false }: ExpenseListProps) {
-    const [expenseStatuses, setExpenseStatuses] = useState<Record<string, string>>({})
+export function ExpenseList({ expenses, user, showEmployee = false, isAdmin = false }: ExpenseListProps) {
 
-    const handleStatusChange = (expenseId: string, newStatus: "approved" | "rejected") => {
-        setExpenseStatuses((prev) => ({ ...prev, [expenseId]: newStatus }))
+    const statusChange = useChangeExpenseStatus()
+
+
+    const handleStatusChange = (expenseId: string | undefined, newStatus: "approved" | "rejected") => {
+        if (!expenseId || !newStatus) {
+            toast.error("expenseId or status required");
+        }
+        //setExpenseStatuses((prev) => ({ ...prev, [expenseId]: newStatus }))
+        statusChange.mutate({ id: expenseId, status: newStatus }, {
+            onSuccess: (data) => {
+                toast.success(data.message);
+            }
+        })
         toast.success(`Expense ${newStatus} successfully`)
     }
 
-    const getEmployee = (employeeId: string) => {
-        return mockUsers.find((user) => user.id === employeeId)
-    }
+    // const getEmployee = (employeeId: string) => {
+    //      return mockUsers.find((user) => user.id === employeeId)
+    // }
 
-    const getStatusVariant = (status: string) => {
+    const getStatusVariant = (status: string | undefined) => {
         switch (status) {
             case "approved":
                 return "default"
@@ -42,7 +56,8 @@ export function ExpenseList({ expenses, showEmployee = false, isAdmin = false }:
         }
     }
 
-    if (expenses.length === 0) {
+    console.log("expenses length", expenses?.length, expenses)
+    if (expenses?.length === 0) {
         return (
             <div className="text-center py-8 text-muted-foreground">
                 <Receipt className="h-12 w-12 mx-auto mb-4 opacity-50" />
@@ -66,14 +81,14 @@ export function ExpenseList({ expenses, showEmployee = false, isAdmin = false }:
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {expenses.map((expense) => {
-                        const employee = getEmployee(expense.employeeId)
-                        const currentStatus = expenseStatuses[expense.id] || expense.status
+                    {expenses && expenses?.map((expense) => {
+
+
 
                         return (
-                            <TableRow key={expense.id}>
-                                <TableCell className="font-medium">{new Date(expense.date).toLocaleDateString()}</TableCell>
-                                <TableCell>{expense.description}</TableCell>
+                            <TableRow key={expense?._id}>
+                                <TableCell className="font-medium">{new Date(expense?.date).toLocaleDateString()}</TableCell>
+                                <TableCell>{expense?.notes}</TableCell>
                                 <TableCell>
                                     <Badge variant="outline" className="capitalize">
                                         {expense.category}
@@ -85,29 +100,29 @@ export function ExpenseList({ expenses, showEmployee = false, isAdmin = false }:
                                         <div className="flex items-center space-x-2">
                                             <Avatar className="h-6 w-6">
                                                 <AvatarFallback className="text-xs">
-                                                    {employee?.name
+                                                    {user?.name
                                                         .split(" ")
                                                         .map((n) => n[0])
                                                         .join("") || "U"}
                                                 </AvatarFallback>
                                             </Avatar>
-                                            <span className="text-sm">{employee?.name || "Unknown"}</span>
+                                            <span className="text-sm">{user?.name || "Unknown"}</span>
                                         </div>
                                     </TableCell>
                                 )}
                                 <TableCell>
-                                    <Badge variant={getStatusVariant(currentStatus)} className="capitalize">
-                                        {currentStatus}
+                                    <Badge variant={getStatusVariant(expense?.status)} className="capitalize">
+                                        {expense.status}
                                     </Badge>
                                 </TableCell>
                                 {isAdmin && (
                                     <TableCell>
-                                        {currentStatus === "pending" ? (
+                                        {expense.status === "pending" ? (
                                             <div className="flex items-center space-x-2">
                                                 <Button
                                                     size="sm"
                                                     variant="outline"
-                                                    onClick={() => handleStatusChange(expense.id, "approved")}
+                                                    onClick={() => handleStatusChange(expense?._id, "approved")}
                                                     className="text-green-600 hover:text-green-700"
                                                 >
                                                     <Check className="h-4 w-4" />
@@ -115,7 +130,7 @@ export function ExpenseList({ expenses, showEmployee = false, isAdmin = false }:
                                                 <Button
                                                     size="sm"
                                                     variant="outline"
-                                                    onClick={() => handleStatusChange(expense.id, "rejected")}
+                                                    onClick={() => handleStatusChange(expense?._id, "rejected")}
                                                     className="text-red-600 hover:text-red-700"
                                                 >
                                                     <X className="h-4 w-4" />

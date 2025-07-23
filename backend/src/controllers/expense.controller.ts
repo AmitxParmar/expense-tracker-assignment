@@ -19,13 +19,13 @@ export const addExpense = async (req: Request, res: Response, next: NextFunction
             notes,
             user: req.user.id,
         });
-        
+
         await logAudit({
             action: "Expense Created",
             details: `Expense #${expense._id} created by user ${req.user.id}`,
             user: req.user.id,
         });
-        res.status(201).json({ success: true, expense });
+        res.status(201).json({ success: true, data: expense, message: "Expense added successfully!" });
     } catch (err) {
         next(err);
     }
@@ -35,7 +35,7 @@ export const addExpense = async (req: Request, res: Response, next: NextFunction
 export const getMyExpenses = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const expenses = await Expense.find({ user: req.user.id }).sort({ date: -1 });
-        res.json({ success: true, expenses });
+        res.json({ success: true, data: expenses });
     } catch (err) {
         next(err);
     }
@@ -58,7 +58,7 @@ export const getAllExpenses =
             const expenses = await Expense.find(filter)
                 .populate("user", "name email")
                 .sort({ date: -1 });
-            res.json({ success: true, expenses });
+            res.json({ success: true, data: expenses, message: "All expenses fetched successfully!" });
         } catch (err) {
             next(err);
         }
@@ -136,7 +136,7 @@ export const getAuditLogs =
                 .populate("user", "name email")
                 .sort({ timestamp: -1 })
                 .limit(200);
-            res.json({ success: true, logs });
+            res.json({ success: true, data: logs, message: "Logs fetched successfully!" });
         } catch (err) {
             next(err);
         }

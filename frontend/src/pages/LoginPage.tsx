@@ -9,23 +9,23 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Icons } from "@/constants/Icons";
-import { useForm } from "react-hook-form";
-
+import { useForm, type SubmitHandler } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { KeyRound } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import type { Credentials } from "@/types/types";
 
+
 const Login = () => {
-    const form = useForm();
+    const form = useForm<Credentials>();
     const { login } = useAuth();
     const navigate = useNavigate();
     const { mutate: loginUser, status } = login;
 
     const isPending = status === "pending";
 
-    const handleSubmit = (credentials) => {
+    const handleSubmit: SubmitHandler<Credentials> = (credentials) => {
         loginUser(credentials, {
             onSuccess: (data) => {
                 toast.success("Login Success!");
@@ -34,7 +34,7 @@ const Login = () => {
             onError: (error) => {
                 toast.error("Error Loggin In!", { description: error.message });
             },
-        }); // on save button press send data to the apis
+        }); 
     };
 
     return (

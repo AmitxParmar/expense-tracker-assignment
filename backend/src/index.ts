@@ -2,6 +2,7 @@ import cors from "cors";
 import express from "express";
 import cookieParser from "cookie-parser";
 import authRouter from "./routes/auth.route";
+import expensesRouter from "./routes/expense.route"
 import connectDB from "./config/db";
 
 const app = express();
@@ -24,7 +25,7 @@ app.get("/", (req: express.Request, res: express.Response) => {
 
 /* route handlers */
 app.use("/api/auth", authRouter);
-app.use("/api/expenses", authRouter);
+app.use("/api/expenses", expensesRouter);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

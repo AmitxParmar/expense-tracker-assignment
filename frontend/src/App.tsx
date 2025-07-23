@@ -10,7 +10,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { useAuth } from "./hooks/useAuth";
 
 function App() {
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated,user } = useAuth()
   return (
     <Routes>
       <Route element={<AuthLayout />}>

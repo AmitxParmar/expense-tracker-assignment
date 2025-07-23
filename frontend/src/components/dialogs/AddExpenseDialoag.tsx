@@ -14,43 +14,42 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner"
-import type { IUser } from "@/types/types"
+import type { IExpense } from "@/types/types"
+import { useAddExpense } from "@/hooks/useAddExpenses"
 
 interface AddExpenseDialogProps {
     open: boolean
     onOpenChange: (open: boolean) => void
-    currentUser: IUser
 }
 
 const categories = ["travel", "meals", "office-supplies", "software", "training", "marketing", "other"]
 
-export function AddExpenseDialog({ open, onOpenChange, currentUser }: AddExpenseDialogProps) {
-    const [formData, setFormData] = useState({
-        description: "",
-        amount: "",
+export function AddExpenseDialog({ open, onOpenChange, }: AddExpenseDialogProps) {
+    const addExpense = useAddExpense()
+    const [formData, setFormData] = useState<IExpense>({
+        notes: "",
+        amount: 0,
         category: "",
-        date: new Date().toISOString().split("T")[0],
-        receipt: null as File | null,
+        date: new Date(),
     })
-
     const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault()
-
-        if (!formData.description || !formData.amount || !formData.category) {
+        e.preventDefault();
+        if (!formData.notes || !formData.amount || !formData.category) {
             toast.error("Please fill in all required fields")
             return
         }
-
+        addExpense.mutate(formData, {
+            onSuccess: (data) => toast.success(data.message)
+        })
         // Simulate API call
-        toast.success("Expense submitted successfully!")
+
 
         // Reset form
         setFormData({
-            description: "",
-            amount: "",
+            notes: "",
+            amount: 0,
             category: "",
-            date: new Date().toISOString().split("T")[0],
-            receipt: null,
+            date: new Date(),
         })
 
         onOpenChange(false)
@@ -68,12 +67,12 @@ export function AddExpenseDialog({ open, onOpenChange, currentUser }: AddExpense
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="space-y-2">
-                        <Label htmlFor="description">Description *</Label>
+                        <Label htmlFor="notes">Notes *</Label>
                         <Input
-                            id="description"
-                            placeholder="Enter expense description"
-                            value={formData.description}
-                            onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
+                            id="notes"
+                            placeholder="Enter expense notes"
+                            value={formData.notes}
+                            onChange={(e) => setFormData((prev) => ({ ...prev, notes: e.target.value }))}
                             required
                         />
                     </div>
@@ -86,8 +85,8 @@ export function AddExpenseDialog({ open, onOpenChange, currentUser }: AddExpense
                                 type="number"
                                 step="0.01"
                                 placeholder="0.00"
-                                value={formData.amount}
-                                onChange={(e) => setFormData((prev) => ({ ...prev, amount: e.target.value }))}
+                                value={formData.amount === 0 ? "" : formData.amount}
+                                onChange={(e) => setFormData((prev) => ({ ...prev, amount: Number(e.target.value) }))}
                                 required
                             />
                         </div>
@@ -97,8 +96,8 @@ export function AddExpenseDialog({ open, onOpenChange, currentUser }: AddExpense
                             <Input
                                 id="date"
                                 type="date"
-                                value={formData.date}
-                                onChange={(e) => setFormData((prev) => ({ ...prev, date: e.target.value }))}
+                                value={formData.date ? formData.date.toISOString().split('T')[0] : ""}
+                                onChange={(e) => setFormData((prev) => ({ ...prev, date: new Date(e.target.value) }))}
                                 required
                             />
                         </div>
