@@ -1,19 +1,15 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { loginUser, registerUser, fetchMe } from "@/services/authServices";
-import { useNavigate } from "react-router-dom";
-// Zustand store for persisting auth state
 
 // React Query hook for auth operations
 export const useAuth = () => {
-    const queryClient = useQueryClient();
-    const navigate = useNavigate();
 
-    const updateAuthState = (isAuthenticated) => {
+    const updateAuthState = (isAuthenticated: string) => {
         localStorage.setItem("isAuthenticated", isAuthenticated);
     };
 
-    const isAuthenticated = !!JSON.parse(localStorage.getItem("isAuthenticated"));
+    const isAuthenticated = !!JSON.parse(localStorage.getItem("isAuthenticated") || "false");
 
     const {
         isLoading,
@@ -38,10 +34,10 @@ export const useAuth = () => {
     const loginMutation = useMutation({
         mutationFn: loginUser,
         onSuccess: () => {
-            updateAuthState(true);
+            updateAuthState("true");
         },
         onError: (error) => {
-            updateAuthState(false);
+            updateAuthState("false");
             console.log(error);
         },
     });
@@ -62,9 +58,10 @@ export const useAuth = () => {
         user: data?.data,
         isLoading,
         error,
-        isAuthenticated: JSON.parse(localStorage.getItem("isAuthenticated")),
+        isAuthenticated: JSON.parse(localStorage.getItem("isAuthenticated") || "false"),
         login: loginMutation,
         register: registerMutation,
         refetchUser,
-    };
-};
+    }
+
+}

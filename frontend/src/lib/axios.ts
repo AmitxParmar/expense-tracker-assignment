@@ -1,5 +1,6 @@
+//@ts-ignore
 import { refreshToken } from "@/services/authServices";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -31,7 +32,7 @@ const publicPaths = [
     // Add any other public paths here
 ];
 
-const isPublicPath = (url) => {
+const isPublicPath = (url: string) => {
     return publicPaths.some((path) => url?.includes(path));
 };
 
@@ -46,7 +47,7 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
     (config) => {
         // Always allow public paths
-        if (isPublicPath(config.url)) {
+        if (isPublicPath(config?.url!)) {
             return config;
         }
 
@@ -90,7 +91,7 @@ axiosInstance.interceptors.response.use(
             originalRequest._retry = true;
 
             try {
-                const isAllowed = JSON.parse(localStorage.getItem("isAuthenticated"));
+                const isAllowed = JSON.parse(localStorage.getItem("isAuthenticated") || "{}");
 
                 if (isAllowed) {
                     refreshAttemptTracker.set(requestId, currentAttempts + 1);
@@ -106,12 +107,13 @@ axiosInstance.interceptors.response.use(
             } catch (err) {
                 console.error("Token refresh failed:", err);
                 // Only clear and redirect if we're certain the refresh failed
-                if (
-                    err.response?.status === 401 ||
-                    err.message === "No access token received"
-                ) {
-                    clearAuthAndRedirect();
-                }
+                if (err instanceof AxiosError)
+                    if (
+                        err.response?.status === 401 ||
+                        err.message === "No access token received"
+                    ) {
+                        clearAuthAndRedirect();
+                    }
                 return Promise.reject(err);
             }
         }
@@ -120,9 +122,6 @@ axiosInstance.interceptors.response.use(
     }
 );
 
-// Add a method to reset the refresh attempts counter
-axiosInstance.resetRefreshAttempts = () => {
-    refreshAttemptTracker.clear();
-};
+
 
 export default axiosInstance;

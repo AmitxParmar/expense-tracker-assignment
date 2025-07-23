@@ -110,7 +110,7 @@ export function EmployeeLayout({ currentUser, activeTab, setActiveTab }: Employe
                         </Button>
                     </CardHeader>
                     <CardContent>
-                        {data?.success && <ExpenseList expenses={data?.data} showEmployee={false} />}
+                        {data?.success && <ExpenseList user={currentUser} expenses={data?.data} showEmployee={false} />}
                     </CardContent>
                 </Card>
             )}
@@ -175,7 +175,7 @@ export function EmployeeLayout({ currentUser, activeTab, setActiveTab }: Employe
                 </div>
             )}
 
-            <AddExpenseDialog open={showAddExpense} onOpenChange={setShowAddExpense} currentUser={currentUser} />
+            <AddExpenseDialog open={showAddExpense} onOpenChange={setShowAddExpense} />
         </div>
     )
 }

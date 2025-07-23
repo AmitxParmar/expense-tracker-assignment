@@ -5,6 +5,6 @@ export const useAllExpenses = (role: "admin" | "employee") => {
     return useQuery({
         queryKey: ["expenses", "all"],
         queryFn: getAllExpenses,
-        
+        enabled: role === 'admin'
     });
 };
