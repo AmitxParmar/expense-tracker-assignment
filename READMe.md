@@ -4,7 +4,7 @@ A modern, UX-focused expense tracking application built with React, TypeScript, 
 
 ## 🚀 Live Demo
 
-**Live URL:** _[Leave blank - to be filled when hosted]_
+**Live URL:** _[https://expense-tracker-assignment-alpha.vercel.app/]_
 
 ## 📸 Screenshots
 
@@ -21,31 +21,71 @@ _[Leave blank space for screenshots to be added]_
 ### Installation
 
 1. **Clone the repository**
-   \`\`\`bash
+   ```bash
    git clone [repository-url]
-   cd expense-tracker
-   \`\`\`
+   cd main
+   ```
 
-2. **Install dependencies**
-   \`\`\`bash
-   npm install
-   # or
-   yarn install
-   # or
-   pnpm install
-   \`\`\`
+2. **Set up environment variables**
 
-3. **Start the development server**
-   \`\`\`bash
-   npm run dev
-   # or
-   yarn dev
-   # or
-   pnpm dev
-   \`\`\`
+   - Copy the example env files and fill in your own values:
+     ```bash
+     cp backend/.env.example backend/.env
+     cp frontend/.env.example frontend/.env
+     ```
+   - Edit `backend/.env` and `frontend/.env` as needed.
 
-4. **Open your browser**
-   Navigate to `http://localhost:5173`
+3. **Install dependencies**
+
+   - For the backend (Express server):
+     ```bash
+     cd backend
+     npm install
+     # or
+     yarn install
+     # or
+     pnpm install
+     # or
+     bun install
+     ```
+
+   - For the frontend (React app):
+     ```bash
+     cd ../frontend
+     npm install
+     # or
+     yarn install
+     # or
+     pnpm install
+     # or
+     bun install
+     ```
+
+4. **Start the development servers**
+
+   - In one terminal, start the backend:
+     ```bash
+     cd backend
+     npm run dev
+     # or
+     yarn dev
+     # or
+     pnpm dev
+     ```
+   - In another terminal, start the frontend:
+     ```bash
+     cd frontend
+     npm run dev
+     # or
+     yarn dev
+     # or
+     pnpm dev
+     ```
+
+5. **Open your browser**
+
+   - Frontend: Navigate to `http://localhost:5173`
+   - Backend (API): Usually runs on `http://localhost:3000` (or as set in your backend `.env`)
 
 ### Build for Production
 
@@ -92,6 +132,49 @@ expense-tracker/
 └── tsconfig.json
 \`\`\`
 
+\`\`\`
+expense-tracker-server/
+├── src/
+│   ├── controllers/
+│   │   ├── auth.controller.ts         # login, register, refreshToken
+│   │   └── expenses.controller.ts     # addExpense, getExpenses
+│
+│   ├── routes/
+│   │   ├── auth.routes.ts             # /api/auth/*
+│   │   └── expenses.routes.ts         # /api/expenses/*
+│
+│   ├── middleware/
+│   │   ├── auth.middleware.ts         # JWT verification
+│   │   └── error.middleware.ts        # Global error handler
+│
+│   ├── services/
+│   │   ├── auth.service.ts            # business logic for auth
+│   │   └── expenses.service.ts        # business logic for expenses
+│
+│   ├── models/
+│   │   ├── User.ts              # Mongoose schema or Prisma
+│   │   └── Expense.ts
+│   │   └── AuditLog.ts
+│
+│   ├── utils/
+│   │   ├── jwt.ts                     # create/verify token
+│   │   └── cookie.ts                  # set httpOnly cookie
+│
+│   ├── config/
+│   │   └── env.ts                     # load env variables
+│
+│   ├── types/
+│   │   ├── types.ts              # AuthRequest, UserPayload
+│   │   └── express.d.ts
+│
+│   ├── app.ts                         # Express app setup
+│   └── server.ts                      # Entry point (listen)
+│
+├── .env                               # Env variables
+├── tsconfig.json
+├── package.json
+
+\`\`\`
 
 
 

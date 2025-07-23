@@ -1,7 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Bar, BarChart, Line, LineChart, Pie, PieChart, Cell, XAxis, YAxis } from "recharts"
-import { mockExpenses } from "../lib/mock-data"
 import { useExpensesPerCategory } from "@/hooks/useExpensesPerCategory"
 import { useExpensesOverTime } from "@/hooks/useExpensesOverTime"
 import type { IExpense } from "@/types/types"
@@ -50,19 +49,7 @@ export function InsightsView({ role, expenses }: InsightsViewProps) {
     }, [expenses]);
 
     // Status distribution
-    const statusData = Object.entries(
-        mockExpenses.reduce(
-            (acc, expense) => {
-                acc[expense.status] = (acc[expense.status] || 0) + 1
-                return acc
-            },
-            {} as Record<string, number>,
-        ),
-    ).map(([status, count]) => ({
-        status: status.charAt(0).toUpperCase() + status.slice(1),
-        count,
-        fill: status === "approved" ? "#22c55e" : status === "pending" ? "#f59e0b" : "#ef4444",
-    }))
+
 
     return (
         <div className="space-y-6">
