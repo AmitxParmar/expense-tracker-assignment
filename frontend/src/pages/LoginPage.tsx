@@ -29,7 +29,8 @@ const Login = () => {
         loginUser(credentials, {
             onSuccess: () => {
                 toast.success("Login Success!");
-                navigate(`/`);
+                // Use replace: true to ensure navigation to "/" works reliably
+                navigate("/", { replace: true });
             },
             onError: (error) => {
                 toast.error("Error Loggin In!", { description: error.message });

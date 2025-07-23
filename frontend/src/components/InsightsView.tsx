@@ -16,24 +16,9 @@ const chartConfig = {
 }
 
 export function InsightsView() {
-    const { data } = useExpensesPerCategory()
-    console.log(data)
+    const { data: category } = useExpensesPerCategory()
+    console.log("Category", category)
     // Expenses by category
-    const categoryData = Object.entries(
-        mockExpenses.reduce(
-            (acc, expense) => {
-                acc[expense.category] = (acc[expense.category] || 0) + expense.amount
-                return acc
-            },
-            {} as Record<string, number>,
-        ),
-    ).map(([category, amount]) => ({
-        category: category
-            .split("-")
-            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(" "),
-        amount,
-    }))
 
     // Expenses over time (last 6 months)
     const timeData = Array.from({ length: 6 }, (_, i) => {
@@ -75,11 +60,12 @@ export function InsightsView() {
                     </CardHeader>
                     <CardContent>
                         <ChartContainer config={chartConfig} className="h-[300px]">
-                            <BarChart data={categoryData}>
-                                <XAxis dataKey="category" tick={{ fontSize: 12 }} angle={-45} textAnchor="end" height={80} />
+                            <BarChart data={category?.data}>
+                                <XAxis dataKey="_id" tick={{ fontSize: 12 }} angle={-45} textAnchor="end" height={80} />
                                 <YAxis />
                                 <ChartTooltip content={<ChartTooltipContent />} />
-                                <Bar dataKey="amount" fill="var(--color-amount)" radius={[4, 4, 0, 0]} />
+                                <Bar dataKey="total" fill="var(--color-amount)" radius={[4, 4, 0, 0]} />
+
                             </BarChart>
                         </ChartContainer>
                     </CardContent>

@@ -161,6 +161,18 @@ export const login = [
     },
 ];
 
+export const logout = (req: Request, res: Response) => {
+    res.cookie("token", "", {
+        httpOnly: true,
+        expires: new Date(0),
+    });
+    res.cookie("refreshToken", "", {
+        httpOnly: true,
+        expires: new Date(0),
+    });
+    res.status(200).json({ message: "Logged out successfully" });
+};
+
 
 export const refreshToken = async (req: Request, res: Response, next: NextFunction) => {
     console.log("refreshToken triggered!!!!!!", req.cookies);

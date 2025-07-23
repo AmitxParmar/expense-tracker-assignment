@@ -4,15 +4,24 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Receipt, ChevronDown, Shield } from "lucide-react"
 import { EmployeeLayout } from "./layouts/EmployeeLayout"
 import { AdminLayout } from "./layouts/AdminLayout"
-
 import { useAuth } from "@/hooks/useAuth"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuShortcut,
+    DropdownMenuTrigger
+} from "./ui/dropdown-menu"
 
 
 export function ExpenseTracker() {
 
+    const { user: currentUser, logout } = useAuth()
     const [activeTab, setActiveTab] = useState<string>("expenses")
 
-    const { user: currentUser } = useAuth()
+    const handleLogout = () => {
+        logout.mutate()
+    }
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -38,14 +47,27 @@ export function ExpenseTracker() {
                                 {currentUser?.role}
                             </Badge>
 
+                            <DropdownMenu>
 
-                            <Avatar className="h-8 w-8">
-                                <AvatarFallback>
-                                    {currentUser?.name ?? ""}
-                                </AvatarFallback>
-                            </Avatar>
-                            <span className="hidden sm:block">{currentUser?.name}</span>
-                            <ChevronDown className="h-4 w-4" />
+                                <Avatar className="h-8 w-8">
+                                    <AvatarFallback>
+                                        {currentUser?.name ?? ""}
+                                    </AvatarFallback>
+                                </Avatar>
+                                <DropdownMenuTrigger className="flex items-center justify-center">
+                                    <span className="hidden sm:block">{currentUser?.name}</span>
+                                    <ChevronDown className="h-4 w-4" />
+
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="w-56" align="start">
+
+                                    <DropdownMenuItem onClick={() => handleLogout()}>
+                                        LOGOUT
+                                        <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+                                    </DropdownMenuItem>
+
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         </div>
                     </div>
                 </div>

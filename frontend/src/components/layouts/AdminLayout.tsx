@@ -42,7 +42,7 @@ export function AdminLayout({ currentUser, activeTab, setActiveTab }: AdminLayou
     }, [expenses]);
 
     const tabs = [
-        { id: "all-expenses", label: "All Expenses", icon: Receipt },
+        { id: "expenses", label: "All Expenses", icon: Receipt },
         { id: "insights", label: "Insights", icon: BarChart3 },
         { id: "audit-logs", label: "Audit Logs", icon: FileText },
     ]
@@ -131,7 +131,7 @@ export function AdminLayout({ currentUser, activeTab, setActiveTab }: AdminLayou
             </div>
 
             {/* Content */}
-            {activeTab === "all-expenses" && (
+            {activeTab === "expenses" && (
                 <Card>
                     <CardHeader>
                         <CardTitle>All Expenses</CardTitle>
