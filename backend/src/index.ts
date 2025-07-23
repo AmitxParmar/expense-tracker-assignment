@@ -25,7 +25,6 @@ app.use(express.urlencoded({ extended: false }));
 app.set("trust proxy", 1);
 connectDB()
 
-app.options("*", cors());
 
 app.use((err: ErrorRequestHandler, req: Request, res: Response, next: NextFunction) => {
   res.header("Access-Control-Allow-Credentials", "true");
