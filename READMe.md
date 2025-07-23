@@ -109,7 +109,7 @@ npm run preview
 
 ### Project Structure
 
-\`\`\`
+```plaintext
 expense-tracker/
 ├── src/
 │   ├── components/
@@ -130,9 +130,7 @@ expense-tracker/
 ├── vite.config.ts
 ├── tailwind.config.ts
 └── tsconfig.json
-\`\`\`
 
-\`\`\`
 expense-tracker-server/
 ├── src/
 │   ├── controllers/
@@ -173,9 +171,7 @@ expense-tracker-server/
 ├── .env                               # Env variables
 ├── tsconfig.json
 ├── package.json
-
-\`\`\`
-
+```
 
 
 ### Key Architecture Decisions
