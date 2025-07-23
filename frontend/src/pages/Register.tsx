@@ -44,7 +44,7 @@ const Register = () => {
     const handleSubmit = (credentials: Credentials) => {
         registerUser(credentials, {
             onSuccess: (data) => {
-                navigate(`/dashboard/${data?.data.role}`);
+                navigate(`/`);
             },
             onError: (error) => {
                 if (error instanceof AxiosError)

@@ -29,7 +29,7 @@ const Login = () => {
         loginUser(credentials, {
             onSuccess: (data) => {
                 toast.success("Login Success!");
-                navigate(`/dashboard/${data?.data.role}`);
+                navigate(`/`);
             },
             onError: (error) => {
                 toast.error("Error Loggin In!", { description: error.message });
